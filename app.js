@@ -2,6 +2,7 @@ import dotenv from "dotenv"
 import express from "express"
 import cors from "cors"
 import connectDB from "./config/connectDb.js"
+import router from "./routes/userRoutes.js"
 
 dotenv.config()
 
@@ -16,6 +17,9 @@ connectDB(DATABASE_URL)
 
 //JSON
 app.use(express.json())
+
+//Routes
+app.use("/api",router)
 
 app.listen(port,()=>{
     console.log(`listening to the PORT ${port}`)

@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         trim:true
     },
     tc:{
-        type:String,
+        type:Boolean,
         required:true,
         trim:true
     }
