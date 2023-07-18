@@ -4,7 +4,7 @@ import UserModel from "../models/User.js"
 export const userRegistration = async(req, res) =>{
     const {name, email, password, password_confirmation, tc }   = req.body
     console.log("eamil//",email)
-    const user =  UserModel.findOne({email:email})
+    const user = await UserModel.findOne({email:email})
     console.log("user...", user)
     if(user){
         res.send({
