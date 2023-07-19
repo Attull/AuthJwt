@@ -1,11 +1,9 @@
 import UserModel from "../models/User.js"
-
+import bcrypt from "bcrypt"
 
 export const userRegistration = async(req, res) =>{
     const {name, email, password, password_confirmation, tc }   = req.body
-    console.log("eamil//",email)
     const user = await UserModel.findOne({email:email})
-    console.log("user...", user)
     if(user){
         res.send({
             "status":"Failed",
@@ -14,15 +12,19 @@ export const userRegistration = async(req, res) =>{
     } else{
         if(name && email && password && password_confirmation && tc){
             if(password === password_confirmation){
+
                 try{
+                    const salt = await bcrypt.genSalt(10)
+                    const hashPassword = await bcrypt.hash(password,salt)
                     const newUser = new UserModel({
                         name:name,
-                        password:password,
+                        password:hashPassword,
                         email:email,
                         tc:tc
                     })
         
                     await newUser.save()
+
                 } catch(err){
                     console.log(err)
                     res.send({
