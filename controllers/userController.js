@@ -1,5 +1,6 @@
 import UserModel from "../models/User.js"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 export const userRegistration = async(req, res) =>{
     const {name, email, password, password_confirmation, tc }   = req.body
@@ -25,9 +26,18 @@ export const userRegistration = async(req, res) =>{
         
                     await newUser.save()
 
+                    const saved_user = await UserModel.findOne({email:email})
+                    const token = jwt.sign({userId:saved_user._id}, 
+                                            process.env.JWT_SECRET_KEY ,
+                                            {expiresIn:'5d'})
+
+                    res.status(201).send({
+                        "message":"Success",
+                        "token" :token
+                    })
                 } catch(err){
                     console.log(err)
-                    res.send({
+                    res.status(500).send({
                         "status":"Failed",
                         "message":"failed to register"
                     })
@@ -35,7 +45,7 @@ export const userRegistration = async(req, res) =>{
             }
       
         }else{
-            res.send({
+            res.status(400).send({
                 "status":"Failed",
                 "message":"All fields are required"
             })
@@ -51,9 +61,14 @@ export const userLogin = async(req, res) =>{
             if(user !=null){
                 const isMatch = bcrypt.compare(password, user.password)
                 if(user.email ===email && isMatch ){
-                    res.send({
+                    const token = jwt.sign({userId:saved_user._id}, 
+                                            process.env.JWT_SECRET_KEY ,
+                                            {expiresIn:'5d'})
+
+                    res.status(200).send({
                         "status":"success",
-                        "message":"Login success"
+                        "message":"Login success",
+                        "token":token
                     })
                 } else{
                     res.send({
@@ -77,3 +92,17 @@ export const userLogin = async(req, res) =>{
 
     }
 }
+
+export const changePassword = async () =>{
+    
+    const {password,password_confirmation} = req.body
+    if(password !== password_confirmation){
+        res.send({
+            "status":"Failed",
+            "message":"Passwords didn't password"
+        })
+    }else{
+
+    }
+}
+
